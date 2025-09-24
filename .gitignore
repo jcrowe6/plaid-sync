@@ -1,5 +1,5 @@
-config/sandbox
-sandbox.db
-config/prod*
 __pycache__/
+.venv/
+config/*.ini
+config/*.bkp
 *.db
