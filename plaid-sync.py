@@ -584,35 +584,36 @@ def main():
                 print("%50s: to fix" % "")
 
     # check for any out of date accounts
-    for account_name, sync in results.items():
-        if not sync.item_info:
-            continue
+    if sync_type == "date-range":
+        for account_name, sync in results.items():
+            if not sync.item_info:
+                continue
 
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+            now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        if (
-            sync.item_info.ts_last_failed_update
-            > sync.item_info.ts_last_successful_update
-        ):
-            print(
-                "%-50s: Last attempt failed!  Last failure: %s  Last success: %s"
-                % (
-                    account_name,
-                    sync.item_info.ts_last_failed_update,
-                    sync.item_info.ts_last_successful_update,
+            if (
+                sync.item_info.ts_last_failed_update
+                > sync.item_info.ts_last_successful_update
+            ):
+                print(
+                    "%-50s: Last attempt failed!  Last failure: %s  Last success: %s"
+                    % (
+                        account_name,
+                        sync.item_info.ts_last_failed_update,
+                        sync.item_info.ts_last_successful_update,
+                    )
                 )
-            )
-        elif sync.item_info.ts_last_successful_update < (
-            now - datetime.timedelta(days=3)
-        ):
-            print(
-                "%-50s: Last successful update > 3 days ago!  Last failure: %s  Last success: %s"
-                % (
-                    account_name,
-                    sync.item_info.ts_last_failed_update,
-                    sync.item_info.ts_last_successful_update,
+            elif sync.item_info.ts_last_successful_update < (
+                now - datetime.timedelta(days=3)
+            ):
+                print(
+                    "%-50s: Last successful update > 3 days ago!  Last failure: %s  Last success: %s"
+                    % (
+                        account_name,
+                        sync.item_info.ts_last_failed_update,
+                        sync.item_info.ts_last_successful_update,
+                    )
                 )
-            )
 
 
 if __name__ == "__main__":
