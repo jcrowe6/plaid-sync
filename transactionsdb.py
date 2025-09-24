@@ -4,7 +4,7 @@ import sqlite3
 import json
 import datetime
 
-from typing import List, Optional, Dict
+from typing import List
 
 from plaidapi import AccountBalance, AccountInfo, Transaction as PlaidTransaction
 
@@ -39,7 +39,7 @@ class TransactionsDB:
 
         c.execute("""
             create table if not exists items
-                (item_id, institution_id, consent_expiration, last_failed_update, last_successful_update, updated, plaid_json)
+                (item_id, institution_id, consent_expiration, last_failed_update, last_successful_update, updated, plaid_json, cursor)
         """)
         c.execute("create unique index if not exists items_idx ON items(item_id)")
 

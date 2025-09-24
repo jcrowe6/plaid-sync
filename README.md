@@ -107,9 +107,16 @@ And you can now run the sync process:
 ```
 $ ./plaid-sync.py -c config/sandbox
                                                                                        
-Finished syncing 2 Plaid accounts
+Finished syncing 2 Plaid accounts using cursor-based sync
 
 Test Chase : 16 new transactions (0 pending),  0 archived transactions over 5 accounts
+```
+
+The sync process now uses Plaid's cursor-based `/sync` endpoint by default. If you want to use this project's original
+date-range based sync you can supply the argument `--date-range-sync`
+
+```
+$ ./plaid-sync.py -c config/sandbox --date-range-sync -s "2025-08-21" -e "2025-09-21"
 ```
 
 ## Updating an Expired Account

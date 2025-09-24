@@ -60,10 +60,10 @@ def parse_options():
         help="[YYYY-MM-DD] End date for querying transactions. If ommitted, tomorrow is used.",
     )
     parser.add_argument(
-        "--cursor-sync",
-        dest="cursor_sync",
+        "--date-range-sync",
+        dest="date_range_sync",
         action="store_true",
-        help="Use Plaid's cursor-based /transactions/sync endpoint instead of date-range /transactions/get. This is more efficient and gets all available historical data.",
+        help="Use the project's original date-range based manual sync.",
     )
     parser.add_argument(
         "--update-account",
@@ -78,7 +78,7 @@ def parse_options():
     )
     args = parser.parse_args()
 
-    if not args.cursor_sync:
+    if args.date_range_sync:
         if not args.start_date:
             args.start_date = (
                 datetime.datetime.now() - datetime.timedelta(days=30)
@@ -161,7 +161,6 @@ class PlaidSynchronizer:
                     print("     Fetching current balances")
                 balances = self.plaid.get_account_balance(self.access_token)
 
-            # Get the last cursor from database (you'll need to implement this in your TransactionsDB)
             last_cursor = self.db.get_last_sync_cursor(self.item_info.item_id)
 
             if verbose:
@@ -253,9 +252,8 @@ class PlaidSynchronizer:
                     transaction
                 )  # This should update existing records
 
-            # Save the cursor for next sync (you'll need to implement this in your TransactionsDB)
-            if hasattr(self.db, "save_sync_cursor"):
-                self.db.save_sync_cursor(self.item_info.item_id, sync_result["cursor"])
+            # Save the cursor for next sync
+            self.db.save_sync_cursor(self.item_info.item_id, sync_result["cursor"])
 
         except plaidapi.PlaidError as ex:
             self.plaid_error = ex
@@ -266,11 +264,13 @@ class PlaidSynchronizer:
         end_date,
         fetch_balances=True,
         verbose=False,
-        use_cursor_sync=False,
+        use_cursor_sync=True,
     ):
+        # New default sync method using plaid's /transactions/sync endpoint
         if use_cursor_sync:
             return self.sync_with_cursor(fetch_balances=fetch_balances, verbose=verbose)
 
+        # Original date-range based sync method
         try:
             if verbose:
                 print("Account: %s" % self.account_name)
@@ -522,15 +522,7 @@ def main():
         sync = PlaidSynchronizer(
             db, plaid, account_name, cfg.get_account_access_token(account_name)
         )
-        if args.cursor_sync:
-            sync.sync(
-                start_date=None,  # Not used in cursor sync
-                end_date=None,  # Not used in cursor sync
-                fetch_balances=args.balances,
-                verbose=args.verbose,
-                use_cursor_sync=True,
-            )
-        else:
+        if args.date_range_sync:
             sync.sync(
                 args.start_date,
                 args.end_date,
@@ -538,11 +530,19 @@ def main():
                 verbose=args.verbose,
                 use_cursor_sync=False,
             )
+        else:
+            sync.sync(
+                start_date=None,  # Not used in cursor sync
+                end_date=None,  # Not used in cursor sync
+                fetch_balances=args.balances,
+                verbose=args.verbose,
+                use_cursor_sync=True,
+            )
         results[account_name] = sync
 
     tqdm = try_get_tqdm() if not args.verbose else None
     if tqdm:
-        sync_type = "cursor-based" if args.cursor_sync else "date-range"
+        sync_type = "date-range" if args.date_range_sync else "cursor-based"
         for account_name in tqdm(
             cfg.get_enabled_accounts(),
             desc=f"Synchronizing Plaid accounts ({sync_type})",
@@ -555,7 +555,7 @@ def main():
 
     print("")
     print("")
-    sync_type = "cursor-based" if args.cursor_sync else "date-range"
+    sync_type = "date-range" if args.date_range_sync else "cursor-based"
     print(
         "Finished syncing %d Plaid accounts using %s sync" % (len(results), sync_type)
     )
