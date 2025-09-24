@@ -2,14 +2,6 @@
 
 `plaid-sync` is a Python based command-line interface to the [Plaid API](https://plaid.com/docs/api/) that synchronizes your bank/credit card transactions to a local SQLite database.
 
-## This fork's changes
-
-This fork of `plaid-sync` makes it compatible with `plaid-python v30.x` vs. the original v7.1.0, providing access to newer Plaid features -
-in particular the personal finance categorization fields `personal_finance_category*`.
-
-Along with this, it also implements Plaid's new preferred style of cursor-based transaction syncing.
-
-
 ## Use-Cases
 
 The data can be easily queried using SQLite JSON query syntax, so this could be used as part of a standard personal finance workflow. Determine how often you eat out, how
@@ -37,7 +29,7 @@ just Plaid's servers/code.
 
 This program incorporates a very simple webserver to handle the Plaid Link portion. This is only needed when setting up a new account, or when an existing account needs a credentials refresh. In my experience, the credentials refresh is going to happen periodically - one bank has a 90 day policy, another needed it after I was locked out of my account due to invalid login attempts. 
 
-# Limitations
+## Limitations
 
 Plaid's lower tiers do not provide investment or libabilities details, so this cannot
 sync mortgage or brokerage transactions. It does work fine with all of the credit card and bank accounts I need it to.

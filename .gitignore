@@ -1,8 +1,5 @@
 config/sandbox
 sandbox.db
 config/prod*
-__pycache__
-*.txt
+__pycache__/
 *.db
-*.csv
-upload.py
