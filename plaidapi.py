@@ -18,6 +18,7 @@ from plaid.model.transactions_get_request import TransactionsGetRequest
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
+from plaid.model.sandbox_item_reset_login_request import SandboxItemResetLoginRequest
 
 
 class AccountBalance:
@@ -191,14 +192,9 @@ class PlaidAPI:
         Otherwise, attempting to update will just display "Account
         already connected." in the Plaid browser UI.
         """
-        # Note: This method would need to be implemented using the proper sandbox endpoint
-        # The SDK v30 may have a different way to handle this
-        return self.client.post(
-            "/sandbox/item/reset_login",
-            {
-                "access_token": access_token,
-            },
-        )
+
+        req = SandboxItemResetLoginRequest(access_token=access_token)
+        return self.client.sandbox_item_reset_login(req)
 
     @wrap_plaid_error
     def get_item_info(self, access_token: str) -> AccountInfo:
