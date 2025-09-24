@@ -76,7 +76,9 @@ dbfile = /tmp/sandbox.db
 
 Once you've set up the basic credentials, run through linking a new account:
 
-```$ ./plaid-sync.py -c config/sandbox --link 'Test Chase'
+```
+$ ./plaid-sync.py -c config/sandbox --link-account 'Test Chase'
+
 Open the following page in your browser to continue:
     http://127.0.0.1:4583/link.html
 ```
@@ -85,7 +87,8 @@ Open the above link, follow the instructions (click the button, find your bank, 
 
 The console will then update with confirmation:
 
-```Public token obtained [public-sandbox-XXXX]. Exchanging for access token.
+```
+Public token obtained [public-sandbox-XXXX]. Exchanging for access token.
 Access token received: access-sandbox-XXXX
 
 Saving new link to configuration file
@@ -119,11 +122,22 @@ date-range based sync you can supply the argument `--date-range-sync`
 $ ./plaid-sync.py -c config/sandbox --date-range-sync -s "2025-08-21" -e "2025-09-21"
 ```
 
+Included is a script `./show_recent.sh` to quickly check the recent transactions saved in the database file.
+
+```
+$ ./show_recent.sh sandbox.db
+
+2025-09-21T14:34:26Z|Uber 063015 SF**POOL**|5.4
+2025-09-21T14:34:26Z|United Airlines|-500.0
+2025-09-21T14:34:26Z|McDonald's|12.0
+```
+
 ## Updating an Expired Account
 
 Occasionally you'll get an error like this while syncing:
 
-```./plaid-sync.py -c config/sandbox                       
+```
+./plaid-sync.py -c config/sandbox                       
 
 Finished syncing 2 Plaid accounts
 
